@@ -84,9 +84,20 @@ public class DinoManager {
                 type.getSpeed()
             );
 
-            if (living instanceof Wolf wolf) {
-                wolf.setAngry(true);
-            }
+if (living instanceof Wolf wolf) {
+    wolf.setAngry(true);
+}
+if (living instanceof Phantom phantom) {
+    phantom.setFireTicks(0);
+}
+// Forhindre at flyvende dinos brænder
+living.setFireTicks(0);
+if (type.canFly()) {
+    living.addPotionEffect(new org.bukkit.potion.PotionEffect(
+        org.bukkit.potion.PotionEffectType.FIRE_RESISTANCE,
+        Integer.MAX_VALUE, 1, false, false
+    ));
+}
         }
 
         DinoData data = new DinoData(entity.getUniqueId(), type);
