@@ -1,0 +1,20 @@
+name: DinoPlugin
+version: 1.0
+main: dk.dino.dinoplugin.DinoPlugin
+api-version: 1.21
+authors: [DinoServer]
+description: Dinosaur spawn, tame og ride plugin
+
+commands:
+  dino:
+    description: Dinosaur kommandoer
+    usage: /dino [spawn|list|release|count|clear]
+    permission: dino.use
+
+permissions:
+  dino.use:
+    description: Brug dino kommandoer
+    default: true
+  dino.admin:
+    description: Admin dino kommandoer
+    default: op
