@@ -1,7 +1,6 @@
 package dk.dino.dinoplugin;
 
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -59,36 +58,16 @@ public class DinoManager {
             living.setCustomName(ChatColor.translateAlternateColorCodes('&', type.getColoredName()));
             living.setCustomNameVisible(true);
 
-            // Sæt liv - brug generisk attribut navn
-            try {
-                var healthAttr = living.getAttribute(Attribute.valueOf("GENERIC_MAX_HEALTH"));
-                if (healthAttr != null) {
-                    healthAttr.setBaseValue(type.getHealth());
+            // Sæt liv og hastighed via generisk attribut opslag
+            for (var attribute : living.getAttributes()) {
+                String key = attribute.getAttribute().getKey().getKey();
+                if (key.equals("max_health") || key.equals("generic.max_health")) {
+                    attribute.setBaseValue(type.getHealth());
                     living.setHealth(type.getHealth());
                 }
-            } catch (Exception ignored) {
-                try {
-                    var healthAttr = living.getAttribute(Attribute.MAX_HEALTH);
-                    if (healthAttr != null) {
-                        healthAttr.setBaseValue(type.getHealth());
-                        living.setHealth(type.getHealth());
-                    }
-                } catch (Exception ignored2) {}
-            }
-
-            // Sæt hastighed
-            try {
-                var speedAttr = living.getAttribute(Attribute.valueOf("GENERIC_MOVEMENT_SPEED"));
-                if (speedAttr != null) {
-                    speedAttr.setBaseValue(type.getSpeed());
+                if (key.equals("movement_speed") || key.equals("generic.movement_speed")) {
+                    attribute.setBaseValue(type.getSpeed());
                 }
-            } catch (Exception ignored) {
-                try {
-                    var speedAttr = living.getAttribute(Attribute.MOVEMENT_SPEED);
-                    if (speedAttr != null) {
-                        speedAttr.setBaseValue(type.getSpeed());
-                    }
-                } catch (Exception ignored2) {}
             }
 
             if (living instanceof Wolf wolf) {
