@@ -17,7 +17,7 @@ public class DinoManager {
     private static final int MAX_DINOS = 20;
     private static final int MIN_DISTANCE = 30;
     private static final int MAX_DISTANCE = 100;
-    private static final int SPAWN_INTERVAL_TICKS = 20 * 60 * 5; // 5 minutter
+    private static final int SPAWN_INTERVAL_TICKS = 20 * 60 * 5;
 
     public DinoManager(DinoPlugin plugin) {
         this.plugin = plugin;
@@ -56,22 +56,41 @@ public class DinoManager {
         Entity entity = loc.getWorld().spawnEntity(loc, type.getEntityType());
 
         if (entity instanceof LivingEntity living) {
-            // Sæt navn
             living.setCustomName(ChatColor.translateAlternateColorCodes('&', type.getColoredName()));
             living.setCustomNameVisible(true);
 
-            // Sæt liv
-            if (living.getAttribute(Attribute.MAX_HEALTH) != null) {
-                living.getAttribute(Attribute.MAX_HEALTH).setBaseValue(type.getHealth());
-                living.setHealth(type.getHealth());
+            // Sæt liv - brug generisk attribut navn
+            try {
+                var healthAttr = living.getAttribute(Attribute.valueOf("GENERIC_MAX_HEALTH"));
+                if (healthAttr != null) {
+                    healthAttr.setBaseValue(type.getHealth());
+                    living.setHealth(type.getHealth());
+                }
+            } catch (Exception ignored) {
+                try {
+                    var healthAttr = living.getAttribute(Attribute.MAX_HEALTH);
+                    if (healthAttr != null) {
+                        healthAttr.setBaseValue(type.getHealth());
+                        living.setHealth(type.getHealth());
+                    }
+                } catch (Exception ignored2) {}
             }
 
             // Sæt hastighed
-            if (living.getAttribute(Attribute.MOVEMENT_SPEED) != null) {
-                living.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(type.getSpeed());
+            try {
+                var speedAttr = living.getAttribute(Attribute.valueOf("GENERIC_MOVEMENT_SPEED"));
+                if (speedAttr != null) {
+                    speedAttr.setBaseValue(type.getSpeed());
+                }
+            } catch (Exception ignored) {
+                try {
+                    var speedAttr = living.getAttribute(Attribute.MOVEMENT_SPEED);
+                    if (speedAttr != null) {
+                        speedAttr.setBaseValue(type.getSpeed());
+                    }
+                } catch (Exception ignored2) {}
             }
 
-            // Wolf = vred
             if (living instanceof Wolf wolf) {
                 wolf.setAngry(true);
             }
@@ -97,7 +116,6 @@ public class DinoManager {
         DinoData data = dinos.get(entity.getUniqueId());
         if (data == null || data.isTamed()) return false;
 
-        // 30% chance for afvisning
         if (new Random().nextInt(10) < 3) return false;
 
         data.incrementTameProgress();
@@ -120,7 +138,6 @@ public class DinoManager {
             return true;
         }
 
-        // Vis progress bar
         int filled = (int)((double) progress / TAME_REQUIRED * 10);
         StringBuilder bar = new StringBuilder(ChatColor.GOLD + "Taming: ");
         for (int i = 0; i < 10; i++) {
