@@ -18,6 +18,18 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Flyt filer til rigtige mapper
+        run: |
+          mkdir -p src/main/java/dk/dino/dinoplugin
+          mkdir -p src/main/resources
+          mv DinoCommand.java src/main/java/dk/dino/dinoplugin/
+          mv DinoData.java src/main/java/dk/dino/dinoplugin/
+          mv DinoListener.java src/main/java/dk/dino/dinoplugin/
+          mv DinoManager.java src/main/java/dk/dino/dinoplugin/
+          mv DinoPlugin.java src/main/java/dk/dino/dinoplugin/
+          mv DinoType.java src/main/java/dk/dino/dinoplugin/
+          mv plugin.yml src/main/resources/
+
       - name: Byg med Maven
         run: mvn package -q
 
