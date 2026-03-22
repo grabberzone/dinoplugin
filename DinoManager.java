@@ -1,6 +1,8 @@
 package dk.dino.dinoplugin;
 
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -51,6 +53,19 @@ public class DinoManager {
         ));
     }
 
+    private void setAttributeSafe(LivingEntity living, String[] names, double value) {
+        for (String name : names) {
+            try {
+                Attribute attr = Attribute.valueOf(name);
+                AttributeInstance inst = living.getAttribute(attr);
+                if (inst != null) {
+                    inst.setBaseValue(value);
+                    return;
+                }
+            } catch (IllegalArgumentException ignored) {}
+        }
+    }
+
     public Entity spawnDino(DinoType type, Location loc) {
         Entity entity = loc.getWorld().spawnEntity(loc, type.getEntityType());
 
@@ -58,17 +73,16 @@ public class DinoManager {
             living.setCustomName(ChatColor.translateAlternateColorCodes('&', type.getColoredName()));
             living.setCustomNameVisible(true);
 
-            // Sæt liv og hastighed via generisk attribut opslag
-            for (var attribute : living.getAttributes()) {
-                String key = attribute.getAttribute().getKey().getKey();
-                if (key.equals("max_health") || key.equals("generic.max_health")) {
-                    attribute.setBaseValue(type.getHealth());
-                    living.setHealth(type.getHealth());
-                }
-                if (key.equals("movement_speed") || key.equals("generic.movement_speed")) {
-                    attribute.setBaseValue(type.getSpeed());
-                }
-            }
+            setAttributeSafe(living,
+                new String[]{"MAX_HEALTH", "GENERIC_MAX_HEALTH"},
+                type.getHealth()
+            );
+            living.setHealth(Math.min(type.getHealth(), living.getMaxHealth()));
+
+            setAttributeSafe(living,
+                new String[]{"MOVEMENT_SPEED", "GENERIC_MOVEMENT_SPEED"},
+                type.getSpeed()
+            );
 
             if (living instanceof Wolf wolf) {
                 wolf.setAngry(true);
