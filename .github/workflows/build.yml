@@ -1,0 +1,28 @@
+name: Byg DinoPlugin
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Hent kode
+        uses: actions/checkout@v3
+
+      - name: Installer Java 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Byg med Maven
+        run: mvn package -q
+
+      - name: Upload DinoPlugin.jar
+        uses: actions/upload-artifact@v3
+        with:
+          name: DinoPlugin
+          path: target/dinoplugin-1.0.jar
